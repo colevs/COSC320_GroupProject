@@ -38,10 +38,6 @@ def Read_Replacement_List(path, filename):
 	# Return without the header row
 	return replacement_list[1:]
 
-def Read_Replacement_Dict(replacement_list):
-	replacement_dict = {replacement_pair[0] : replacement_pair[1] for replacement_pair in replacement_list}
-	return replacement_dict
-
 
 def Word_Replacement(test_iteration_n, test_iteration_m):
 	### CONFIG ###
@@ -73,8 +69,6 @@ def Word_Replacement(test_iteration_n, test_iteration_m):
 
 	replacement_list_length = len(replacement_list)
 
-	replacement_dict = Read_Replacement_Dict(replacement_list)
-
 	print(f'There are {len(filenames)} files to process')
 	i = 0
 	for file in filenames:
@@ -102,16 +96,14 @@ def Word_Replacement(test_iteration_n, test_iteration_m):
 				punctuation = punctuation[::-1] 
 
 				# Check if the word needs to be replaced
-				try:
-					replacement_word = replacement_dict[word.upper()]
-					# Capitalize first letter if it was capitalized in initial text
-					if word[0].isupper():
-						word_list[word_index] = replacement_word.capitalize() + punctuation
-					else:
-						word_list[word_index] = replacement_word.lower() + punctuation
-
-				except KeyError:
-					pass
+				for replacement_pair in replacement_list:
+					if word.lower() == replacement_pair[0].lower():
+						# Capitalize first letter if it was capitalized in initial text
+						if word[0].isupper():
+							word_list[word_index] = replacement_pair[1].capitalize() + punctuation
+						else:
+							word_list[word_index] = replacement_pair[1].lower() + punctuation
+						break
 
 			# Add the fixed word list back to your list of paragraphs
 			paragraph_list[paragraph_index] = " ".join(word_list)
@@ -141,4 +133,8 @@ if __name__ == '__main__':
 	# 	time_taken = t2 - t1
 	# 	print(f'With n = {n}, m = {m}, it took {time_taken} seconds')
 
+	t1 = time.perf_counter()
 	Word_Replacement(None, None)
+	t2 = time.perf_counter()
+	time_taken = t2 - t1
+	print(f'It took {time_taken} seconds to go through the whole dataset')
